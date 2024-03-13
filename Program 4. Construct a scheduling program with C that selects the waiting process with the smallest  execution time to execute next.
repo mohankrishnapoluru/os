@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+struct Process {
+    int id;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    bool executed;
+};
+
+int findShortestJob(struct Process processes[], int n, int current_time) {
+    int shortest_job_index = -1;
+    int shortest_job_time = __INT_MAX__;
+
+    for (int i = 0; i < n; ++i) {
+        if (!processes[i].executed && processes[i].arrival_time <= current_time && processes[i].remaining_time < shortest_job_time) {
+            shortest_job_index = i;
+            shortest_job_time = processes[i].remaining_time;
+        }
+    }
+
+    return shortest_job_index;
+}
+
+void executeScheduling(struct Process processes[], int n) {
+    int current_time = 0;
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        int shortest_job_index = findShortestJob(processes, n, current_time);
+
+        if (shortest_job_index == -1) {
+            ++current_time;
+            continue;
+        }
+
+        printf("Process %d executing from time %d to ", processes[shortest_job_index].id, current_time);
+        current_time += processes[shortest_job_index].remaining_time;
+        printf("%d\n", current_time);
+
+        processes[shortest_job_index].executed = true;
+        ++completed_processes;
+
+        // Update remaining times for other waiting processes
+        for (int i = 0; i < n; ++i) {
+            if (!processes[i].executed && processes[i].arrival_time <= current_time) {
+                processes[i].remaining_time -= processes[shortest_job_index].remaining_time;
+            }
+        }
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    printf("Enter arrival time and burst time for each process:\n");
+    for (int i = 0; i < n; ++i) {
+        processes[i].id = i + 1;
+        printf("Process %d:\n", processes[i].id);
+        printf("Arrival time: ");
+        scanf("%d", &processes[i].arrival_time);
+        printf("Burst time: ");
+        scanf("%d", &processes[i].burst_time);
+        processes[i].remaining_time = processes[i].burst_time;
+        processes[i].executed = false;
+    }
+    executeScheduling(processes, n);
+
+    return 0;
+} 
