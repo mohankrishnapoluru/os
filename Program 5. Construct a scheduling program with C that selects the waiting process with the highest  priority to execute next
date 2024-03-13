@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdbool.h>
+struct Process {
+    int id;
+    int arrival_time;
+    int burst_time;
+    int priority;
+    bool executed;
+};
+int findHighestPriority(struct Process processes[], int n, int current_time) {
+    int highest_priority_index = -1;
+    int highest_priority = -1;
+
+    for (int i = 0; i < n; ++i) {
+        if (!processes[i].executed && processes[i].arrival_time <= current_time && processes[i].priority > highest_priority) {
+            highest_priority_index = i;
+            highest_priority = processes[i].priority;
+        }
+    }
+
+    return highest_priority_index;
+}
+void executeScheduling(struct Process processes[], int n) {
+    int current_time = 0;
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        int highest_priority_index = findHighestPriority(processes, n, current_time);
+
+        if (highest_priority_index == -1) {
+            ++current_time;
+            continue;
+        }
+        printf("Process %d executing from time %d to ", processes[highest_priority_index].id, current_time);
+        current_time += processes[highest_priority_index].burst_time;
+        printf("%d\n", current_time);
+        processes[highest_priority_index].executed = true;
+        ++completed_processes;
+    }
+}
+int main() {
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    // Input process details
+    printf("Enter arrival time, burst time, and priority for each process:\n");
+    for (int i = 0; i < n; ++i) {
+        processes[i].id = i + 1;
+        printf("Process %d:\n", processes[i].id);
+        printf("Arrival time: ");
+        scanf("%d", &processes[i].arrival_time);
+        printf("Burst time: ");
+        scanf("%d", &processes[i].burst_time);
+        printf("Priority: ");
+        scanf("%d", &processes[i].priority);
+        processes[i].executed = false;
+    }
+
+    // Execute scheduling algorithm
+    executeScheduling(processes, n);
+
+    return 0;
+}
