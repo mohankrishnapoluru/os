@@ -1,0 +1,19 @@
+CREATING THREADS:
+
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_function(void *arg) {
+    int *num = (int *)arg;
+    printf("Thread created with argument: %d\n", *num);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t tid;
+    int arg = 10;
+    pthread_create(&tid, NULL, thread_function, &arg);
+    pthread_join(tid, NULL);
+    printf("Thread execution completed\n");
+    return 0;
+}
