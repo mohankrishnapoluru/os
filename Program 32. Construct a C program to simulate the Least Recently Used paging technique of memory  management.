@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FRAME_SIZE 3 // Number of frames in memory
+
+int main() {
+    int pages[] = {1, 2, 3, 4, 5, 3, 4, 1, 6, 7, 8}; // Page reference sequence
+    int num_pages = sizeof(pages) / sizeof(pages[0]);
+    int frames[FRAME_SIZE]; // Frames in memory
+    int last_use[FRAME_SIZE]; // Time of last use for each page
+    int page_faults = 0; // Counter for page faults
+
+    // Initialize frames as empty (-1 indicates an empty frame)
+    for (int i = 0; i < FRAME_SIZE; i++) {
+        frames[i] = -1;
+        last_use[i] = 0; // Initialize last use time for each frame
+    }
+
+    printf("Page Reference String: ");
+    for (int i = 0; i < num_pages; i++) {
+        printf("%d ", pages[i]);
+    }
+    printf("\n");
+
+    // Simulate LRU page replacement algorithm
+    for (int i = 0; i < num_pages; i++) {
+        int page = pages[i];
+        int found = 0; // Flag to indicate if page is found in memory
+
+        // Check if page is already in memory
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            if (frames[j] == page) {
+                found = 1;
+                last_use[j] = i + 1; // Update last use time to current time
+                break;
+            }
+        }
+
+        // If page is not in memory, replace the least recently used page
+        if (!found) {
+            int min_index = 0;
+            for (int j = 1; j < FRAME_SIZE; j++) {
+                if (last_use[j] < last_use[min_index]) {
+                    min_index = j;
+                }
+            }
+            frames[min_index] = page;
+            last_use[min_index] = i + 1; // Update last use time to current time
+            page_faults++;
+        }
+
+        // Print current state of memory after each page reference
+        printf("Page reference: %d | Frames: ", page);
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
