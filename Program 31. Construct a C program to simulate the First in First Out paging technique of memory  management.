@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FRAME_SIZE 3 // Number of frames in memory
+
+int main() {
+    int pages[] = {1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5}; // Page reference sequence
+    int num_pages = sizeof(pages) / sizeof(pages[0]);
+    int frames[FRAME_SIZE]; // Frames in memory
+    int frame_index = 0; // Index to keep track of the oldest frame
+
+    int page_faults = 0; // Counter for page faults
+
+    // Initialize frames as empty (-1 indicates an empty frame)
+    for (int i = 0; i < FRAME_SIZE; i++) {
+        frames[i] = -1;
+    }
+
+    printf("Page Reference String: ");
+    for (int i = 0; i < num_pages; i++) {
+        printf("%d ", pages[i]);
+    }
+    printf("\n");
+
+    // Simulate FIFO page replacement algorithm
+    for (int i = 0; i < num_pages; i++) {
+        int page = pages[i];
+        int found = 0; // Flag to indicate if page is found in memory
+
+        // Check if page is already in memory
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            if (frames[j] == page) {
+                found = 1;
+                break;
+            }
+        }
+
+        // If page is not in memory, replace the oldest page
+        if (!found) {
+            frames[frame_index] = page;
+            frame_index = (frame_index + 1) % FRAME_SIZE; // Update the index to point to the next oldest frame
+            page_faults++;
+        }
+
+        // Print current state of memory after each page reference
+        printf("Page reference: %d | Frames: ", page);
+        for (int j = 0; j < FRAME_SIZE; j++) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", page_faults);
+
+    return 0;
+}
