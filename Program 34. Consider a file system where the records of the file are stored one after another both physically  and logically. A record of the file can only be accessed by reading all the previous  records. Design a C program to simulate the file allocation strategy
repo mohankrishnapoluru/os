@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_RECORDS 100
+
+// Structure to represent a record
+typedef struct {
+    int recordNumber;
+    char data[256]; // Assuming each record has a data field of size 256
+} Record;
+
+// Function to simulate accessing records sequentially
+void accessRecords(Record records[], int numRecords) {
+    int i;
+    printf("Accessing records sequentially:\n");
+    for (i = 0; i < numRecords; i++) {
+        printf("Record %d: %s\n", records[i].recordNumber, records[i].data);
+    }
+}
+
+int main() {
+    int numRecords;
+    Record records[MAX_RECORDS];
+
+    printf("Enter the number of records: ");
+    scanf("%d", &numRecords);
+
+    if (numRecords <= 0 || numRecords > MAX_RECORDS) {
+        printf("Invalid number of records. Exiting...\n");
+        return 1;
+    }
+
+    // Initialize records
+    int i;
+    for (i = 0; i < numRecords; i++) {
+        records[i].recordNumber = i + 1;
+        sprintf(records[i].data, "Data for record %d", i + 1);
+    }
+
+    // Simulate accessing records sequentially
+    accessRecords(records, numRecords);
+
+    return 0;
+}
