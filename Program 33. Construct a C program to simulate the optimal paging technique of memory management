@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FRAME_SIZE 4
+#define PAGE_REF_SIZE 12
+
+int main() {
+    int pageReferences[PAGE_REF_SIZE] = {1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5};
+    int frames[FRAME_SIZE];
+    int pageFaults = 0;
+    int i, j;
+
+    // Initialize frames with -1 to indicate empty frame
+    for (i = 0; i < FRAME_SIZE; i++) {
+        frames[i] = -1;
+    }
+
+    // Loop through page references
+    for (i = 0; i < PAGE_REF_SIZE; i++) {
+        int pageReferenced = pageReferences[i];
+        int pageFound = 0;
+
+        // Check if page is already in frame
+        for (j = 0; j < FRAME_SIZE; j++) {
+            if (frames[j] == pageReferenced) {
+                pageFound = 1;
+                break;
+            }
+        }
+
+        // If page not found, replace using optimal paging
+        if (!pageFound) {
+            pageFaults++;
+            int pageToReplace = -1;
+            int furthestUsed = -1;
+
+            // Find the page to replace which will not be used for the longest time
+            for (j = 0; j < FRAME_SIZE; j++) {
+                int k;
+                int futureUse = 0;
+                for (k = i + 1; k < PAGE_REF_SIZE; k++) {
+                    if (frames[j] == pageReferences[k]) {
+                        futureUse = k;
+                        break;
+                    }
+                }
+                if (futureUse == 0) {
+                    pageToReplace = j;
+                    break;
+                }
+                if (futureUse > furthestUsed) {
+                    furthestUsed = futureUse;
+                    pageToReplace = j;
+                }
+            }
+
+            // Replace page in frame
+            frames[pageToReplace] = pageReferenced;
+        }
+
+        // Print current frames
+        printf("Page %d: ", pageReferenced);
+        for (j = 0; j < FRAME_SIZE; j++) {
+            if (frames[j] == -1) {
+                printf("- ");
+            } else {
+                printf("%d ", frames[j]);
+            }
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", pageFaults);
+
+    return 0;
+}
